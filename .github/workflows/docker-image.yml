@@ -13,6 +13,7 @@ jobs:
         id: image_info
         run: |
           IMAGE_NAME="matrixdotorg/synapse:latest"
+          docker pull $IMAGE_NAME
           IMAGE_ID="$(docker inspect --format='{{.Id}}' $IMAGE_NAME)"
           IMAGE_UPDATED="$(docker inspect --format='{{.Metadata.LastTagTime}}' $IMAGE_NAME)"
           echo ::set-output name=image_id::$IMAGE_ID
@@ -21,6 +22,7 @@ jobs:
         id: check_rebuild
         run: |
           CUSTOM_IMAGE_NAME="ghcr.io/rexjohannes/synapse:latest"
+          docker pull $CUSTOM_IMAGE_NAME
           CUSTOM_IMAGE_ID="$(docker inspect --format='{{.Id}}' $CUSTOM_IMAGE_NAME)"
           CUSTOM_IMAGE_UPDATED="$(docker inspect --format='{{.Metadata.LastTagTime}}' $CUSTOM_IMAGE_NAME)"
           if [ "$CUSTOM_IMAGE_ID" != "" ] && [ "$IMAGE_ID" != "" ] && [ "$CUSTOM_IMAGE_UPDATED" != "" ] && [ "$IMAGE_UPDATED" != "" ] && [ "$IMAGE_UPDATED" != "$CUSTOM_IMAGE_UPDATED" ]; then
