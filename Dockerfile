@@ -1,6 +1,6 @@
 FROM matrixdotorg/synapse:latest
 
-LABEL: org.opencontainers.image.source = "https://github.com/rexjohannes/matrix-synapse-s3-docker"
+LABEL org.opencontainers.image.source = "https://github.com/rexjohannes/matrix-synapse-s3-docker"
 
 RUN apt -y update \
     && apt -y upgrade \
