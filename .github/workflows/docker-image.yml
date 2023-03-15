@@ -2,6 +2,7 @@ name: Build and publish Docker image
 on:
   schedule:
     - cron: '0 */6 * * *' # run every 6 hours
+  workflow_dispatch:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
