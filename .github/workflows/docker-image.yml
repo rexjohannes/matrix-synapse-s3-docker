@@ -1,0 +1,41 @@
+name: Build and publish Docker image
+on:
+  schedule:
+    - cron: '0 */6 * * *' # run every 6 hours
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Get image information
+        id: image_info
+        run: |
+          IMAGE_NAME="matrixdotorg/synapse:latest"
+          IMAGE_ID="$(docker inspect --format='{{.Id}}' $IMAGE_NAME)"
+          IMAGE_UPDATED="$(docker inspect --format='{{.Metadata.LastTagTime}}' $IMAGE_NAME)"
+          echo ::set-output name=image_id::$IMAGE_ID
+          echo ::set-output name=image_updated::$IMAGE_UPDATED
+      - name: Check if image needs to be rebuilt
+        id: check_rebuild
+        run: |
+          CUSTOM_IMAGE_NAME="ghcr.io/rexjohannes/synapse:latest"
+          CUSTOM_IMAGE_ID="$(docker inspect --format='{{.Id}}' $CUSTOM_IMAGE_NAME)"
+          CUSTOM_IMAGE_UPDATED="$(docker inspect --format='{{.Metadata.LastTagTime}}' $CUSTOM_IMAGE_NAME)"
+          if [ "$CUSTOM_IMAGE_ID" != "" ] && [ "$IMAGE_ID" != "" ] && [ "$CUSTOM_IMAGE_UPDATED" != "" ] && [ "$IMAGE_UPDATED" != "" ] && [ "$IMAGE_UPDATED" != "$CUSTOM_IMAGE_UPDATED" ]; then
+            echo "Image needs to be rebuilt"
+            echo ::set-output name=rebuild::true
+          else
+            echo "Image does not need to be rebuilt"
+            echo ::set-output name=rebuild::false
+          fi
+      - name: Build and publish Docker image
+        if: steps.check_rebuild.outputs.rebuild == 'true'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/rexjohannes/synapse:latest
+        env:
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
