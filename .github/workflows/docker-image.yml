@@ -13,8 +13,14 @@ env:
   IMAGE_NAME: rexjohannes/synapse
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
     steps:
       # Checkout your repository. You don't need this for the check to work, but putting it here saves you an "if: ..."
       - name: Checkout
@@ -27,16 +33,6 @@ jobs:
         with:
           parent-image: matrixdotorg/synapse:latest
           my-image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
-
-    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
