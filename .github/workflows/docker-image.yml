@@ -34,6 +34,7 @@ jobs:
           parent-image: matrixdotorg/synapse:latest
           my-image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
       - name: Checkout repository
+        if: steps.check.outputs.out-of-date == 'true'
         uses: actions/checkout@v3
 
       # Install the cosign tool except on PR
