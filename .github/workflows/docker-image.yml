@@ -32,7 +32,7 @@ jobs:
         uses: twiddler/is-my-docker-parent-image-out-of-date@v1
         with:
           parent-image: matrixdotorg/synapse:latest
-          my-image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          my-image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
       - name: Checkout repository
         if: steps.check.outputs.out-of-date == 'true'
         uses: actions/checkout@v3
